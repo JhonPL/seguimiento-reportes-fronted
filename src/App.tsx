@@ -8,20 +8,18 @@ import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import { useAuth } from "./context/AuthContext";
-//import BasicTableOne from "./components/tables/BasicTables/BasicTableOne";
-import BasicTableThree from "./components/tables/BasicTables/BasicTableThree";
+import TableReportes from "./components/tables/BasicTables/TableReporteS";
 import TableUserRol from "./components/tables/BasicTables/TableUserRol";
 import TableEntidades from "./components/tables/BasicTables/TableEntidades";
-import TableReporteS from "./components/tables/BasicTables/TableReporteS";
 
-// ✅ Componentes de prueba / placeholders
-const Reportes = () => <div className="p-6 text-gray-800 dark:text-gray-100"><BasicTableThree/></div>;
+// ✅ Componentes de páginas
+const Reportes = () => <div className="p-6 text-gray-800 dark:text-gray-100"><TableReportes/></div>;
 const Usuarios = () => <div className="p-6 text-gray-800 dark:text-gray-100"><TableUserRol/></div>;
 const Historico = () => <div className="p-6 text-gray-800 dark:text-gray-100">📊 Histórico</div>;
 const Entidades = () => <div className="p-6 text-gray-800 dark:text-gray-100"><TableEntidades/></div>;
 
-const MisReportes = () => <div className="p-6 text-gray-800 dark:text-gray-100"><BasicTableThree/></div>;
-const ReportesResponsables = () => <div className="p-6 text-gray-800 dark:text-gray-100"><TableReporteS/></div>;
+const MisReportes = () => <div className="p-6 text-gray-800 dark:text-gray-100"><TableReportes/></div>;
+const ReportesResponsables = () => <div className="p-6 text-gray-800 dark:text-gray-100"><TableReportes/></div>;
 const Consultas = () => <div className="p-6 text-gray-800 dark:text-gray-100">🔍 Consulta General</div>;
 const Trazabilidad = () => <div className="p-6 text-gray-800 dark:text-gray-100">📈 Trazabilidad / Métricas</div>;
 
@@ -52,7 +50,7 @@ export default function App() {
           {/* 🔹 Administrador */}
           <Route path="/reportes" element={<Reportes />} />
           <Route path="/usuarios" element={<Usuarios />} />
-          <Route path="/histórico" element={<Historico />} />
+          <Route path="/historico" element={<Historico />} />
           <Route path="/entidades" element={<Entidades />} />
 
           {/* 🔹 Responsable */}
