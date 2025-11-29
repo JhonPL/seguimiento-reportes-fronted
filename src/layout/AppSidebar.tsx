@@ -11,31 +11,37 @@ import {
 import { useSidebar } from "../context/SidebarContext";
 import { useAuth } from "../context/AuthContext";
 
-// ======== MENÚS POR ROL (ajustados a los roles del AuthContext) ======== //
-const menuByRole: Record<string, { name: string; icon: React.ReactNode; path?: string }[]> = {
+// ======== MENUS POR ROL (segun documentacion del sistema) ======== //
+const menuByRole: Record<string, { name: string; icon: React.ReactNode; path: string }[]> = {
+  // ADMINISTRADOR: Acceso completo
   administrador: [
     { icon: <GridIcon />, name: "Dashboard Global", path: "/" },
-    { icon: <ListIcon />, name: "Gestión de Reportes", path: "/reportes" },
+    { icon: <ListIcon />, name: "Gestion de Reportes", path: "/reportes" },
     { icon: <UserCircleIcon />, name: "Usuarios y Roles", path: "/usuarios" },
-    { icon: <HorizontaLDots />, name: "Gestión de Entidades", path: "/entidades" },
-    { icon: <CalenderIcon />, name: "Calendario", path: "/calendar" },
-    { icon: <PieChartIcon />, name: "Histórico", path: "/historico" },
+    { icon: <HorizontaLDots />, name: "Gestion de Entidades", path: "/entidades" },
+    { icon: <CalenderIcon />, name: "Calendario", path: "/calendario" },
+    { icon: <PieChartIcon />, name: "Historico / Trazabilidad", path: "/historico" },
   ],
+  
+  // SUPERVISOR DE CUMPLIMIENTO: Ve solo lo que supervisa
+  supervisor: [
+    { icon: <GridIcon />, name: "Dashboard", path: "/" },
+    { icon: <ListIcon />, name: "Gestor de Reportes", path: "/supervision" },
+    { icon: <CalenderIcon />, name: "Calendario", path: "/calendario" },
+    { icon: <PieChartIcon />, name: "Historico / Trazabilidad", path: "/historico" },
+  ],
+  
+  // RESPONSABLE DE REPORTES: Solo sus reportes asignados
   responsable: [
     { icon: <GridIcon />, name: "Mi Dashboard", path: "/" },
     { icon: <ListIcon />, name: "Mis Reportes", path: "/mis-reportes" },
-    { icon: <CalenderIcon />, name: "Mi Calendario", path: "/calendar" },
+    { icon: <CalenderIcon />, name: "Mi Calendario", path: "/calendario" },
   ],
-  supervisor: [
-    { icon: <GridIcon />, name: "Dashboard", path: "/" },
-    { icon: <ListIcon />, name: "Reportes de Responsables", path: "/reportes-responsables" },
-    { icon: <CalenderIcon />, name: "Calendario", path: "/calendar" },
-    { icon: <PieChartIcon />, name: "Métricas", path: "/metricas" },
-  ],
+  
+  // AUDITOR: Solo lectura
   auditor: [
-    { icon: <GridIcon />, name: "Dashboard Histórico", path: "/" },
-    { icon: <ListIcon />, name: "Consulta General", path: "/consultas" },
-    { icon: <PieChartIcon />, name: "Trazabilidad / Métricas", path: "/trazabilidad" },
+    { icon: <GridIcon />, name: "Dashboard", path: "/" },
+    { icon: <PieChartIcon />, name: "Historico / Trazabilidad", path: "/historico" },
   ],
 };
 
@@ -59,14 +65,14 @@ export default function AppSidebar() {
       {items.map((nav) => (
         <li key={nav.name}>
           <Link
-            to={nav.path || "#"}
+            to={nav.path}
             className={`menu-item group ${
-              isActive(nav.path || "") ? "menu-item-active" : "menu-item-inactive"
+              isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
             }`}
           >
             <span
               className={`menu-item-icon-size ${
-                isActive(nav.path || "")
+                isActive(nav.path)
                   ? "menu-item-icon-active"
                   : "menu-item-icon-inactive"
               }`}
@@ -123,16 +129,16 @@ export default function AppSidebar() {
             </>
           ) : (
             <img
-              // src="/images/logo/llanogas-pes.PNG"
-              // alt="Logo"
-              // width={32}
-              // height={32}
+              src="/images/logo/llanogas-icon.png"
+              alt="Logo"
+              width={32}
+              height={32}
             />
           )}
         </Link>
       </div>
 
-      {/* Menú principal */}
+      {/* Menu principal */}
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
@@ -145,7 +151,7 @@ export default function AppSidebar() {
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Menú Principal"
+                  "Menu Principal"
                 ) : (
                   <HorizontaLDots className="size-6" />
                 )}
@@ -155,6 +161,20 @@ export default function AppSidebar() {
           </div>
         </nav>
       </div>
+
+      {/* Info del usuario */}
+      {(isExpanded || isHovered || isMobileOpen) && user && (
+        <div className="mt-auto pb-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="px-2">
+            <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
+              {user.nombre}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+              {user.role}
+            </p>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }

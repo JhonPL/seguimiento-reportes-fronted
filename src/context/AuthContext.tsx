@@ -1,130 +1,118 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import authService from "../services/authService";
+import api from "../services/api";
 
-// Mapeo de roles del backend a roles del frontend
-const roleMapping: Record<string, string> = {
-  "ROLE_ADMINISTRADOR": "administrador",
-  "ROLE_RESPONSABLE": "responsable", 
-  "ROLE_SUPERVISOR": "supervisor",
-  "ROLE_AUDITOR": "auditor",
-  "Administrador": "administrador",
-  "Responsable": "responsable",
-  "Supervisor": "supervisor",
-  "Auditor": "auditor",
-};
+// Tipos de roles del sistema
+type Role = "administrador" | "supervisor" | "responsable" | "auditor" | null;
 
-// Tipo de rol para el frontend
-type Role = "administrador" | "responsable" | "supervisor" | "auditor";
-
-// Interface del usuario para el frontend
-interface AuthUser {
+interface User {
+  id: number;
   email: string;
   nombre: string;
   role: Role;
+  rolOriginal: string; // El nombre del rol tal como viene del backend
 }
 
 interface AuthContextType {
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: string | null;
+  user: User | null;
+  loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  clearError: () => void;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Función para mapear el rol del backend a los roles del frontend
+const mapearRol = (rolBackend: string): Role => {
+  const rol = rolBackend.toUpperCase();
+  
+  if (rol.includes("ADMIN")) return "administrador";
+  if (rol.includes("SUPERVISOR")) return "supervisor";
+  if (rol.includes("RESPONSABLE") || rol.includes("ELABOR")) return "responsable";
+  if (rol.includes("AUDITOR") || rol.includes("CONSULTA")) return "auditor";
+  
+  // Por defecto, responsable (rol más restrictivo)
+  return "responsable";
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Al cargar, verificar si hay una sesión guardada
+  // Verificar si hay sesión guardada al cargar
   useEffect(() => {
-    const savedUser = authService.getCurrentUser();
-    if (savedUser && authService.isAuthenticated()) {
-      const normalizedRole = (roleMapping[savedUser.rol] || savedUser.rol.toLowerCase()) as Role;
-      setUser({ 
-        email: savedUser.email, 
-        nombre: savedUser.nombre,
-        role: normalizedRole 
-      });
+    const token = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+    
+    if (token && savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
+      } catch (error) {
+        console.error("Error parsing saved user:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
     }
-    setIsLoading(false);
+    setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<void> => {
-    setIsLoading(true);
-    setError(null);
-
+  const login = async (email: string, password: string) => {
+    setLoading(true);
     try {
-      const response = await authService.login(email, password);
-      
-      // Guardar token en localStorage
-      localStorage.setItem('token', response.token);
-      
-      // Normalizar el rol para el frontend
-      const normalizedRole = (roleMapping[response.rol] || response.rol.toLowerCase()) as Role;
-      
-      const userData: AuthUser = {
+      const response = await api.post("/auth/login", {
+        correo: email,
+        contrasena: password,
+      });
+
+      const { token, rol, nombre, usuarioId } = response.data;
+
+      // Guardar token
+      localStorage.setItem("token", token);
+
+      // Crear objeto de usuario
+      const userData: User = {
+        id: usuarioId,
         email: email,
-        nombre: response.nombre,
-        role: normalizedRole,
+        nombre: nombre,
+        role: mapearRol(rol),
+        rolOriginal: rol,
       };
-      
+
+      // Guardar usuario
+      localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
-      
-      // Guardar usuario en localStorage
-      localStorage.setItem('user', JSON.stringify({
-        email: email,
-        nombre: response.nombre,
-        rol: normalizedRole,
-      }));
-      
+
+      // Redirigir al dashboard
       navigate("/");
-    } catch (err: any) {
-      console.error("Error de login:", err);
-      
-      if (err.response) {
-        const status = err.response.status;
-        const message = err.response.data?.message || err.response.data?.error;
-        
-        if (status === 401) {
-          setError("Credenciales incorrectas. Verifique su correo y contraseña.");
-        } else if (status === 403) {
-          setError("Usuario inactivo o sin permisos de acceso.");
-        } else if (status === 404) {
-          setError("Usuario no encontrado.");
-        } else {
-          setError(message || "Error al iniciar sesión. Intente nuevamente.");
-        }
-      } else if (err.request) {
-        setError("No se puede conectar con el servidor. Verifique que el backend esté ejecutándose.");
-      } else {
-        setError("Error inesperado. Intente nuevamente.");
-      }
-      
-      throw err;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const mensaje = err.response?.data?.message || "Credenciales inválidas";
+      throw new Error(mensaje);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   const logout = () => {
-    authService.logout();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
-    setError(null);
     navigate("/signin");
   };
 
-  const clearError = () => {
-    setError(null);
-  };
-
   return (
-    <AuthContext.Provider value={{ user, isLoading, error, login, logout, clearError }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        loading, 
+        login, 
+        logout, 
+        isAuthenticated: !!user 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -134,4 +122,17 @@ export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
+};
+
+// Hook para verificar permisos
+export const useHasPermission = (allowedRoles: Role[]) => {
+  const { user } = useAuth();
+  if (!user || !user.role) return false;
+  return allowedRoles.includes(user.role);
+};
+
+// Hook para obtener el rol actual
+export const useRole = (): Role => {
+  const { user } = useAuth();
+  return user?.role || null;
 };

@@ -8,26 +8,70 @@ import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import { useAuth } from "./context/AuthContext";
+
+// Componentes de tablas
 import TableUserRol from "./components/tables/BasicTables/TableUserRol";
 import TableEntidades from "./components/tables/BasicTables/TableEntidades";
 import TableReporteS from "./components/tables/BasicTables/TableReporteS";
+
+// Paginas
 import GestionInstancias from "./pages/Instancias/GestionInstancias";
 import HistoricoReportes from "./pages/Historico/HistoricoReportes";
+import SupervisionReportes from "./pages/Supervision/SupervisionReportes";
+import MisReportes from "./pages/MisReportes/MisReportes";
 
-// ✅ Componentes de páginas
-const Reportes = () => <div className="p-6 text-gray-800 dark:text-gray-100"><TableReporteS/></div>;
-const Usuarios = () => <div className="p-6 text-gray-800 dark:text-gray-100"><TableUserRol/></div>;
-const Entidades = () => <div className="p-6 text-gray-800 dark:text-gray-100"><TableEntidades/></div>;
+// Paginas wrapper
+const Reportes = () => (
+  <div className="p-6">
+    <TableReporteS />
+  </div>
+);
 
-const MisReportes = () => <div className="p-6 text-gray-800 dark:text-gray-100"><TableReporteS/></div>;
-const ReportesResponsables = () => <div className="p-6 text-gray-800 dark:text-gray-100"><TableReporteS/></div>;
-const Consultas = () => <div className="p-6 text-gray-800 dark:text-gray-100">🔍 Consulta General</div>;
-const Trazabilidad = () => <div className="p-6 text-gray-800 dark:text-gray-100">📈 Trazabilidad / Métricas</div>;
+const Usuarios = () => (
+  <div className="p-6">
+    <TableUserRol />
+  </div>
+);
 
-// ✅ Ruta protegida
+const Entidades = () => (
+  <div className="p-6">
+    <TableEntidades />
+  </div>
+);
+
+// Ruta protegida
 function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <svg className="animate-spin h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+      </div>
+    );
+  }
+  
+  return user ? <>{children}</> : <Navigate to="/signin" />;
+}
+
+// Ruta con restriccion de rol
+function RoleRoute({ 
+  children, 
+  allowedRoles 
+}: { 
+  children: React.ReactNode; 
+  allowedRoles: string[] 
+}) {
   const { user } = useAuth();
-  return <>{user ? children : <Navigate to="/signin" />}</>;
+  
+  if (!user || !allowedRoles.includes(user.role || "")) {
+    return <Navigate to="/" />;
+  }
+  
+  return <>{children}</>;
 }
 
 export default function App() {
@@ -35,7 +79,7 @@ export default function App() {
     <>
       <ScrollToTop />
       <Routes>
-        {/* ✅ Layout protegido */}
+        {/* Layout protegido */}
         <Route
           element={
             <PrivateRoute>
@@ -43,31 +87,81 @@ export default function App() {
             </PrivateRoute>
           }
         >
-          {/* Rutas comunes */}
+          {/* Dashboard - Todos los roles (filtrado segun rol en el componente) */}
           <Route index path="/" element={<Home />} />
-          <Route path="/calendar" element={<Calendar />} />
+          
+          {/* Perfil - Todos */}
           <Route path="/profile" element={<UserProfiles />} />
 
-          {/* 🔹 Administrador */}
-          <Route path="/reportes" element={<Reportes />} />
-          <Route path="/usuarios" element={<Usuarios />} />
-          <Route path="/historico" element={<HistoricoReportes />} />
-          <Route path="/entidades" element={<Entidades />} />
-          <Route path="/instancias" element={<GestionInstancias />} />
+          {/* Calendario - Todos (filtrado segun rol) */}
+          <Route path="/calendario" element={<Calendar />} />
 
-          {/* 🔹 Responsable */}
-          <Route path="/mis-reportes" element={<MisReportes />} />
+          {/* ============ RUTAS ADMINISTRADOR ============ */}
+          <Route
+            path="/reportes"
+            element={
+              <RoleRoute allowedRoles={["administrador"]}>
+                <Reportes />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/usuarios"
+            element={
+              <RoleRoute allowedRoles={["administrador"]}>
+                <Usuarios />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/entidades"
+            element={
+              <RoleRoute allowedRoles={["administrador"]}>
+                <Entidades />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/instancias"
+            element={
+              <RoleRoute allowedRoles={["administrador"]}>
+                <GestionInstancias />
+              </RoleRoute>
+            }
+          />
 
-          {/* 🔹 Supervisor */}
-          <Route path="/reportes-responsables" element={<ReportesResponsables />} />
-          <Route path="/metricas" element={<Trazabilidad />} />
+          {/* ============ RUTAS SUPERVISOR ============ */}
+          <Route
+            path="/supervision"
+            element={
+              <RoleRoute allowedRoles={["supervisor", "administrador"]}>
+                <SupervisionReportes />
+              </RoleRoute>
+            }
+          />
 
-          {/* 🔹 Auditor */}
-          <Route path="/consultas" element={<Consultas />} />
-          <Route path="/trazabilidad" element={<Trazabilidad />} />
+          {/* ============ RUTAS RESPONSABLE ============ */}
+          <Route
+            path="/mis-reportes"
+            element={
+              <RoleRoute allowedRoles={["responsable", "administrador"]}>
+                <MisReportes />
+              </RoleRoute>
+            }
+          />
+
+          {/* ============ HISTORICO - Admin, Supervisor, Auditor ============ */}
+          <Route
+            path="/historico"
+            element={
+              <RoleRoute allowedRoles={["administrador", "supervisor", "auditor"]}>
+                <HistoricoReportes />
+              </RoleRoute>
+            }
+          />
         </Route>
 
-        {/* ✅ Login / Registro */}
+        {/* Login / Registro (publico) */}
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
 
