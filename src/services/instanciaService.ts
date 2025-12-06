@@ -44,6 +44,17 @@ export interface InstanciaReporteDTO {
   prioridad: string;
   vencido: boolean;
   enviado: boolean;
+
+  // ========== CAMPOS DE CORRECCIÓN ==========
+  tieneCorreccion: boolean | null;
+  linkCorreccion: string | null;
+  driveFileIdCorreccion: string | null;
+  nombreArchivoCorreccion: string | null;
+  motivoCorreccion: string | null;
+  fechaCorreccion: string | null;
+  corregidoPorNombre: string | null;
+  corregidoPorId: number | null;
+  puedeCorregir: boolean;
 }
 
 export interface FiltrosHistorico {
@@ -51,6 +62,13 @@ export interface FiltrosHistorico {
   entidadId?: number;
   year?: number;
   mes?: number;
+}
+
+export interface CorreccionResponse {
+  success: boolean;
+  mensaje: string;
+  instancia?: InstanciaReporteDTO;
+  error?: string;
 }
 
 const instanciaService = {
@@ -123,6 +141,8 @@ const instanciaService = {
         },
       }
     );
+
+    window.dispatchEvent(new Event("reportes:updated"));
     return response.data;
   },
 
@@ -134,22 +154,13 @@ const instanciaService = {
     linkReporte: string,
     observaciones?: string,
     linkEvidencia?: string
-): Promise<InstanciaReporteDTO> => {
+  ): Promise<InstanciaReporteDTO> => {
     const payload = { linkReporte, observaciones, linkEvidencia };
 
-    try {
-      try { console.log('[DEBUG instanciaService] enviarReporteConLink payload=', payload); } catch {}
-      const response = await api.post<InstanciaReporteDTO>(`/instancias/${id}/enviar-link`, payload);
-      try { console.log('[DEBUG instanciaService] enviarReporteConLink response=', response.data); } catch {}
-
-      // ⭐⭐⭐ ESTA LÍNEA ES LA QUE FALTABA ⭐⭐⭐
-      window.dispatchEvent(new Event("reportes:updated"));
-
-      return response.data;
-    } catch (err) {
-      try { console.error('[DEBUG instanciaService] enviarReporteConLink error=', (err as any)?.response?.data || err); } catch {}
-      throw err;
-    }
+    const response = await api.post<InstanciaReporteDTO>(`/instancias/${id}/enviar-link`, payload);
+    
+    window.dispatchEvent(new Event("reportes:updated"));
+    return response.data;
   },
 
   /**
@@ -185,6 +196,54 @@ const instanciaService = {
     const response = await api.post<InstanciaReporteDTO>(`/instancias/${id}/rechazar`, {
       motivo
     });
+    return response.data;
+  },
+
+  // ==================== MÉTODOS DE CORRECCIÓN ====================
+
+  /**
+   * Agregar corrección con archivo (SOLO ADMIN)
+   * El archivo original NO se elimina, se mantiene para auditoría
+   */
+  corregirReporte: async (
+    id: number,
+    archivo: File,
+    motivo: string
+  ): Promise<CorreccionResponse> => {
+    const formData = new FormData();
+    formData.append('archivo', archivo);
+    formData.append('motivo', motivo);
+    
+    const response = await api.post<CorreccionResponse>(
+      `/instancias/${id}/corregir`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+
+    window.dispatchEvent(new Event("reportes:updated"));
+    return response.data;
+  },
+
+  /**
+   * Agregar corrección solo con link (SOLO ADMIN)
+   */
+  corregirReporteConLink: async (
+    id: number,
+    linkCorreccion: string,
+    motivo: string
+  ): Promise<CorreccionResponse> => {
+    const payload = { linkCorreccion, motivo };
+
+    const response = await api.post<CorreccionResponse>(
+      `/instancias/${id}/corregir-link`,
+      payload
+    );
+
+    window.dispatchEvent(new Event("reportes:updated"));
     return response.data;
   },
 };

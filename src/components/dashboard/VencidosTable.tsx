@@ -49,7 +49,7 @@ export default function VencidosTable({ reportes, onVerTodos }: VencidosTablePro
       <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">
-            🚨 Reportes Vencidos
+            Reportes Vencidos
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Requieren atención inmediata

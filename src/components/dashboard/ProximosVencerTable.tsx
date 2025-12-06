@@ -51,7 +51,7 @@ export default function ProximosVencerTable({ reportes, onVerTodos }: ProximosVe
       <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            ⏰ Próximos a Vencer
+            Próximos a Vencer
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Reportes que vencen en los próximos 7 días

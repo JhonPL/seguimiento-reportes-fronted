@@ -1,15 +1,18 @@
 import api from "./api";
 
 export interface Entidad {
-  id: number;
+  id?: number;
   nit: string;
   razonSocial: string;
-  sigla: string | null;
-  tipoEntidad: string;
-  direccion: string | null;
-  telefono: string | null;
-  email: string | null;
+  sigla?: string | null;
+  tipoEntidad?: string | null;
+  direccion?: string | null;
+  telefono?: string | null;
+  email?: string | null;
+  paginaWeb?: string | null;
+  baseLegal?: string | null;
   activo: boolean;
+  fechaCreacion?: string | null;
 }
 
 const entidadService = {

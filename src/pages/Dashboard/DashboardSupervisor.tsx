@@ -41,20 +41,7 @@ export default function DashboardSupervisor() {
       setVencidos(vencidosData.reportes || []);
     } catch (err: any) {
       console.error("Error cargando dashboard:", err);
-      // Si no existen los endpoints específicos, usar los generales
-      try {
-        const [stats, proximos, vencidosData] = await Promise.all([
-          estadisticasService.obtenerDashboard(),
-          estadisticasService.obtenerProximosVencer(7),
-          estadisticasService.obtenerVencidos(),
-        ]);
-        
-        setEstadisticas(stats);
-        setProximosVencer(proximos.reportes || []);
-        setVencidos(vencidosData.reportes || []);
-      } catch (fallbackErr) {
-        setError("Error al cargar el dashboard.");
-      }
+      setError("Error al cargar el dashboard. Verifique que el backend tenga los endpoints de estadísticas por supervisor.");
     } finally {
       setLoading(false);
     }

@@ -80,10 +80,17 @@ const Calendar: React.FC = () => {
       // Obtener todos los meses que abarca el rango visible
       const meses = getMesesEnRango(start, end);
       
-      // Cargar eventos de todos los meses necesarios
-      const promesas = meses.map(mes => 
-        calendarioService.obtenerEventos(mes, filterEntidad, undefined, filterFrecuencia)
-      );
+      // Cargar eventos usando mi-calendario (filtra por rol automáticamente)
+      // Solo aplicar filtros de entidad/frecuencia si están seleccionados
+      const promesas = meses.map(mes => {
+        if (filterEntidad || filterFrecuencia) {
+          // Si hay filtros específicos, usar el endpoint general con filtros
+          return calendarioService.obtenerEventos(mes, filterEntidad, undefined, filterFrecuencia);
+        } else {
+          // Sin filtros, usar mi-calendario que filtra por rol
+          return calendarioService.obtenerMiCalendario(mes);
+        }
+      });
       
       const resultados = await Promise.all(promesas);
       const todosEventos = resultados.flat();

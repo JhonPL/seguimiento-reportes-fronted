@@ -135,16 +135,6 @@ export default function SignInForm() {
               </div>
             </div>
           </form>
-
-          {/* Info de roles para desarrollo */}
-          <div className="mt-8 p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">
-              Sistema de Seguimiento de Reportes - Llanogas
-            </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              Contacte al administrador si no puede acceder.
-            </p>
-          </div>
         </div>
       </div>
     </div>

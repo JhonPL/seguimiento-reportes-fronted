@@ -37,6 +37,51 @@ export interface VencidosDTO {
   }>;
 }
 
+// Interface para el dashboard del auditor
+export interface DashboardAuditorDTO {
+  // Métricas principales
+  total: number;
+  enviadosATiempo: number;
+  enviadosTarde: number;
+  vencidos: number;
+  pendientes: number;
+  porcentajeCumplimiento: number;
+  diasRetrasoPromedio: number;
+  
+  // Distribución para gráfico de torta
+  distribucionEstados: Array<{
+    name: string;
+    value: number;
+    color: string;
+  }>;
+  
+  // Cumplimiento por entidad
+  cumplimientoPorEntidad: Array<{
+    entidad: string;
+    total: number;
+    vencidos: number;
+    porcentaje: number;
+  }>;
+  
+  // Cumplimiento por responsable
+  cumplimientoPorResponsable: Array<{
+    responsable: string;
+    total: number;
+    vencidos: number;
+    porcentaje: number;
+  }>;
+  
+  // Tendencia mensual
+  tendenciaMensual: Array<{
+    mes: string;
+    total: number;
+    cumplimiento: number;
+  }>;
+  
+  // Años disponibles
+  aniosDisponibles: number[];
+}
+
 const estadisticasService = {
   // ============ ADMIN - Ve todo ============
   obtenerDashboard: async (): Promise<EstadisticasDTO> => {
@@ -56,56 +101,40 @@ const estadisticasService = {
 
   // ============ SUPERVISOR - Solo sus supervisados ============
   obtenerDashboardSupervisor: async (supervisorId: number): Promise<EstadisticasDTO> => {
-    try {
-      const response = await api.get(`/estadisticas/dashboard/supervisor/${supervisorId}`);
-      return response.data;
-    } catch (error) {
-      // Fallback al endpoint general si no existe el específico
-      const response = await api.get("/estadisticas/dashboard");
-      return response.data;
-    }
+    const response = await api.get(`/estadisticas/dashboard/supervisor/${supervisorId}`);
+    return response.data;
   },
 
   obtenerProximosVencerSupervisor: async (supervisorId: number, dias: number = 7): Promise<ProximosVencerDTO> => {
-    try {
-      const response = await api.get(`/estadisticas/proximos-vencer/supervisor/${supervisorId}?dias=${dias}`);
-      return response.data;
-    } catch (error) {
-      const response = await api.get(`/estadisticas/proximos-vencer?dias=${dias}`);
-      return response.data;
-    }
+    const response = await api.get(`/estadisticas/proximos-vencer/supervisor/${supervisorId}?dias=${dias}`);
+    return response.data;
   },
 
   obtenerVencidosSupervisor: async (supervisorId: number): Promise<VencidosDTO> => {
-    try {
-      const response = await api.get(`/estadisticas/vencidos/supervisor/${supervisorId}`);
-      return response.data;
-    } catch (error) {
-      const response = await api.get("/estadisticas/vencidos");
-      return response.data;
-    }
+    const response = await api.get(`/estadisticas/vencidos/supervisor/${supervisorId}`);
+    return response.data;
   },
 
   // ============ RESPONSABLE - Solo sus reportes ============
   obtenerDashboardResponsable: async (responsableId: number): Promise<EstadisticasDTO> => {
-    try {
-      const response = await api.get(`/estadisticas/dashboard/responsable/${responsableId}`);
-      return response.data;
-    } catch (error) {
-      // Fallback al endpoint general si no existe el específico
-      const response = await api.get("/estadisticas/dashboard");
-      return response.data;
-    }
+    const response = await api.get(`/estadisticas/dashboard/responsable/${responsableId}`);
+    return response.data;
   },
 
   obtenerProximosVencerResponsable: async (responsableId: number, dias: number = 7): Promise<ProximosVencerDTO> => {
-    try {
-      const response = await api.get(`/estadisticas/proximos-vencer/responsable/${responsableId}?dias=${dias}`);
-      return response.data;
-    } catch (error) {
-      const response = await api.get(`/estadisticas/proximos-vencer?dias=${dias}`);
-      return response.data;
-    }
+    const response = await api.get(`/estadisticas/proximos-vencer/responsable/${responsableId}?dias=${dias}`);
+    return response.data;
+  },
+
+  // ============ AUDITOR - Dashboard completo ============
+  obtenerDashboardAuditor: async (anio?: number, mes?: number, trimestre?: number): Promise<DashboardAuditorDTO> => {
+    const params = new URLSearchParams();
+    if (anio !== undefined) params.append('anio', anio.toString());
+    if (mes !== undefined) params.append('mes', mes.toString());
+    if (trimestre !== undefined) params.append('trimestre', trimestre.toString());
+    
+    const response = await api.get(`/estadisticas/dashboard/auditor?${params}`);
+    return response.data;
   },
 };
 

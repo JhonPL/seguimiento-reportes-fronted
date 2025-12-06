@@ -37,18 +37,7 @@ export default function DashboardResponsable() {
       setProximosVencer(proximos.reportes || []);
     } catch (err: any) {
       console.error("Error cargando dashboard:", err);
-      // Si no existen los endpoints específicos, usar los generales
-      try {
-        const [stats, proximos] = await Promise.all([
-          estadisticasService.obtenerDashboard(),
-          estadisticasService.obtenerProximosVencer(7),
-        ]);
-        
-        setEstadisticas(stats);
-        setProximosVencer(proximos.reportes || []);
-      } catch (fallbackErr) {
-        setError("Error al cargar el dashboard.");
-      }
+      setError("Error al cargar el dashboard. Verifique que el backend tenga los endpoints de estadísticas por responsable.");
     } finally {
       setLoading(false);
     }

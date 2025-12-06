@@ -573,10 +573,10 @@ export default function MisReportes() {
 
       {/* Modal de envio - Corregido para modo oscuro y sin scroll */}
       {modalEnvio && selectedInstancia && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 z-[999999] overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="fixed inset-0 bg-black/50" onClick={cerrarModalEnvio}></div>
-            <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-lg w-full">
+            <div className="fixed inset-0 bg-black/50 z-[999999]" onClick={cerrarModalEnvio}></div>
+            <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-lg w-full z-[1000000]">
               {/* Header */}
               <div className="px-6 py-4 bg-blue-600 rounded-t-2xl">
                 <h3 className="text-lg font-semibold text-white">Enviar Reporte</h3>
