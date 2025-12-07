@@ -341,7 +341,7 @@ export default function TableEntidades() {
                     </span>
                   </td>
                   <td className="py-3 px-4 text-gray-600 dark:text-gray-400 text-sm">
-                    {formatDate(entidad.fechaCreacion)}
+                    {formatDate(entidad.fechaCreacion || undefined)}
                   </td>
                   <td className="py-3 px-4 text-right relative">
                     <button
@@ -476,7 +476,7 @@ export default function TableEntidades() {
                   </label>
                   <input
                     type="url"
-                    value={formData.paginaWeb}
+                    value={formData.paginaWeb ?? ""}
                     onChange={(e) => setFormData({ ...formData, paginaWeb: e.target.value })}
                     placeholder="https://www.ejemplo.gov.co"
                     className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-300 focus:ring-3 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
@@ -490,7 +490,7 @@ export default function TableEntidades() {
                   </label>
                   <textarea
                     rows={3}
-                    value={formData.baseLegal}
+                    value={formData.baseLegal ?? ""}
                     onChange={(e) => setFormData({ ...formData, baseLegal: e.target.value })}
                     placeholder="Ley, decreto o resolución que fundamenta los reportes a esta entidad"
                     className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-300 focus:ring-3 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 resize-none"
