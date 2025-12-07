@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // URL base del backend
-const API_BASE_URL = "https://seguimiento-reportes-backend.onrender.com";
+const API_BASE_URL = "https://seguimiento-reportes-backend.onrender.com/api";
 
 // Crear instancia de axios
 const api = axios.create({
