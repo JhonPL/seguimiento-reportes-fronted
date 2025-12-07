@@ -10,7 +10,7 @@ export default function TableReportes() {
   const [reportes, setReportes] = useState<Reporte[]>([]);
   const [entidades, setEntidades] = useState<Entidad[]>([]);
   const [frecuencias, setFrecuencias] = useState<Frecuencia[]>([]);
-  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [_usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [responsables, setResponsables] = useState<Usuario[]>([]);
   const [supervisores, setSupervisores] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
