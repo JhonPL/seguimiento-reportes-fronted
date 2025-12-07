@@ -22,7 +22,7 @@ const authService = {
    */
   login: async (email: string, password: string): Promise<LoginResponse> => {
     // Enviar con los nombres que espera el backend
-    const response = await api.post<LoginResponse>('/login', {
+    const response = await api.post<LoginResponse>('/api/auth/login', {
       correo: email,
       contrasena: password
     });
