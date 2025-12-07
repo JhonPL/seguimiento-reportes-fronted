@@ -275,7 +275,7 @@ const GestionInstancias: React.FC = () => {
                         {formatFecha(instancia.fechaVencimientoCalculada)}
                       </td>
                       <td className="px-4 py-4">
-                        {getPrioridadBadge(instancia.prioridad, instancia.diasHastaVencimiento)}
+                        {getPrioridadBadge(instancia.prioridad, instancia.diasHastaVencimiento ?? 0)}
                       </td>
                       <td className="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
                         {instancia.formatoRequerido || "N/A"}
@@ -304,13 +304,13 @@ const GestionInstancias: React.FC = () => {
           <div className="grid grid-cols-3 gap-4">
             <div className="p-4 rounded-lg bg-red-50 border border-red-200">
               <p className="text-2xl font-bold text-red-700">
-                {instancias.filter(i => i.diasHastaVencimiento < 0).length}
+                {instancias.filter(i => (i.diasHastaVencimiento ?? 0) < 0).length}
               </p>
               <p className="text-xs text-red-600">Vencidos</p>
             </div>
             <div className="p-4 rounded-lg bg-orange-50 border border-orange-200">
               <p className="text-2xl font-bold text-orange-700">
-                {instancias.filter(i => i.diasHastaVencimiento >= 0 && i.diasHastaVencimiento <= 7).length}
+                {instancias.filter(i => (i.diasHastaVencimiento ?? 0) >= 0 && (i.diasHastaVencimiento ?? 0) <= 7).length}
               </p>
               <p className="text-xs text-orange-600">Próximos 7 días</p>
             </div>
