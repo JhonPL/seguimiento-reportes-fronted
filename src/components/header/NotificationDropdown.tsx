@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import alertaService, { AlertaDTO } from "../../services/alertaService";
-import { useAuth } from "../../context/AuthContext";
 
 export default function NotificationDropdown() {
-  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [alertas, setAlertas] = useState<AlertaDTO[]>([]);
   const [loading, setLoading] = useState(false);
