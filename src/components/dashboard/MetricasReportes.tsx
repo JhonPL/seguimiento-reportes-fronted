@@ -14,7 +14,6 @@ export default function MetricasReportes({
   totalObligaciones,
   totalEnviadosATiempo,
   totalVencidos,
-  totalPendientes,
   porcentajeCumplimiento,
   reportesProximos7Dias,
 }: MetricasProps) {
