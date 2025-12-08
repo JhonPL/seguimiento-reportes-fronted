@@ -4,6 +4,7 @@ import entidadService, { Entidad } from "../../../services/entidadService";
 import frecuenciaService, { Frecuencia } from "../../../services/frecuenciaService";
 import usuarioService, { Usuario } from "../../../services/usuarioService";
 import instanciaService, { InstanciaReporteDTO } from "../../../services/instanciaService";
+import DatePicker from "../../form/date-picker";
 
 export default function TableReportes() {
   // Estados principales
@@ -834,13 +835,35 @@ export default function TableReportes() {
                 </div>
 
                 <div className="col-span-1">
-                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Fecha Inicio Vigencia <span className="text-red-500">*</span></label>
-                  <input type="date" value={formData.fechaInicioVigencia} onChange={(e) => setFormData({ ...formData, fechaInicioVigencia: e.target.value })} required className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                  <DatePicker
+                    id="fechaInicioVigencia"
+                    label="Fecha Inicio Vigencia *"
+                    defaultDate={formData.fechaInicioVigencia || undefined}
+                    placeholder="Seleccionar fecha"
+                    onChange={(dates) => {
+                      if (dates[0]) {
+                        const fecha = new Date(dates[0]);
+                        const formatted = fecha.toISOString().split('T')[0];
+                        setFormData({ ...formData, fechaInicioVigencia: formatted });
+                      }
+                    }}
+                  />
                 </div>
 
                 <div className="col-span-1">
-                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Fecha Fin Vigencia <span className="text-red-500">*</span></label>
-                  <input type="date" value={formData.fechaFinVigencia} onChange={(e) => setFormData({ ...formData, fechaFinVigencia: e.target.value })} required min={formData.fechaInicioVigencia || undefined} className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                  <DatePicker
+                    id="fechaFinVigencia"
+                    label="Fecha Fin Vigencia *"
+                    defaultDate={formData.fechaFinVigencia || undefined}
+                    placeholder="Seleccionar fecha"
+                    onChange={(dates) => {
+                      if (dates[0]) {
+                        const fecha = new Date(dates[0]);
+                        const formatted = fecha.toISOString().split('T')[0];
+                        setFormData({ ...formData, fechaFinVigencia: formatted });
+                      }
+                    }}
+                  />
                 </div>
 
                 <div className="col-span-1">
