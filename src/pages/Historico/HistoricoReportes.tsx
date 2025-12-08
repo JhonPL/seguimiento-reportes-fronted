@@ -361,6 +361,9 @@ const HistoricoReportes: React.FC = () => {
                       Cumplimiento
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Enviado por
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Estado
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -390,6 +393,9 @@ const HistoricoReportes: React.FC = () => {
                       </td>
                       <td className="px-4 py-4">
                         {getDesviacionBadge(item.diasDesviacion)}
+                      </td>
+                      <td className="px-4 py-4">
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{item.enviadoPorNombre || "Sistema"}</p>
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-2">
